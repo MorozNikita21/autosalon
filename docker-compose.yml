@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16
+    container_name: autosalon-postgres
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: autosalon
+      POSTGRES_USER: db_autosalon_name
+      POSTGRES_PASSWORD: db_autosalon_pass
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - autosalon-net
+
+volumes:
+  postgres_data:
+
+networks:
+  autosalon-net:
+    driver: bridge

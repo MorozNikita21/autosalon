@@ -1,0 +1,81 @@
+databaseChangeLog:
+
+  - changeSet:
+      id: create-account
+      author: autosalon
+      changes:
+        - sqlFile:
+            path: sql/create_account.sql
+            relativeToChangelogFile: true
+
+  - changeSet:
+      id: create-employee
+      author: autosalon
+      changes:
+        - sqlFile:
+            path: sql/create_employee.sql
+            relativeToChangelogFile: true
+
+  - changeSet:
+      id: create-client
+      author: autosalon
+      changes:
+        - sqlFile:
+            path: sql/create_client.sql
+            relativeToChangelogFile: true
+
+  - changeSet:
+      id: create-model
+      author: autosalon
+      changes:
+        - sqlFile:
+            path: sql/create_model.sql
+            relativeToChangelogFile: true
+
+  - changeSet:
+      id: create-equipment
+      author: autosalon
+      changes:
+        - sqlFile:
+            path: sql/create_equipment.sql
+            relativeToChangelogFile: true
+
+  - changeSet:
+      id: create-car
+      author: autosalon
+      changes:
+        - sqlFile:
+            path: sql/create_car.sql
+            relativeToChangelogFile: true
+
+  - changeSet:
+      id: create-orders
+      author: autosalon
+      changes:
+        - sqlFile:
+            path: sql/create_orders.sql
+            relativeToChangelogFile: true
+
+  - changeSet:
+      id: create-test-drive
+      author: autosalon
+      changes:
+        - sqlFile:
+            path: sql/create_test_drive.sql
+            relativeToChangelogFile: true
+
+  - changeSet:
+      id: create-score
+      author: autosalon
+      changes:
+        - sqlFile:
+            path: sql/create_score.sql
+            relativeToChangelogFile: true
+
+  - changeSet:
+      id: create-constraints
+      author: autosalon
+      changes:
+        - sqlFile:
+            path: sql/create_constraints.sql
+            relativeToChangelogFile: true
