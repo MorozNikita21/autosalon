@@ -4,7 +4,9 @@ spring:
       on-profile: dev
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/autosalon
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:autosalon_dev}
+    username: ${DB_USER:db_autosalon_name}
+    password: ${DB_PASSWORD:db_autosalon_pass}
 
   liquibase:
     contexts: development

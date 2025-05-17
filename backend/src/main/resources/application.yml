@@ -1,7 +1,5 @@
 spring:
   datasource:
-    username: db_autosalon_name
-    password: db_autosalon_pass
     driver-class-name: org.postgresql.Driver
 
   liquibase:
