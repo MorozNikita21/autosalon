@@ -1,1 +1,3 @@
-[![Coverage](https://img.shields.io/codecov/c/github/yourorg/autosalon-backend?branch=main)](https://codecov.io/gh/yourorg/autosalon-backend)
+# autosalon
+
+[![CI](https://github.com/MorozNikita21/autosalon/actions/workflows/build-and-test.yml/badge.svg)](https://github.com/MorozNikita21/autosalon/actions/workflows/build-and-test.yml)
