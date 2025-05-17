@@ -37,11 +37,14 @@ jobs:
       - name: Build & run tests
         run: ./gradlew clean build jacocoTestReport --no-daemon
 
-      - name: Publish JaCoCo report artifact
+      - name: Upload quality reports
         uses: actions/upload-artifact@v3
         with:
-          name: jacoco-report
-          path: backend/build/reports/jacoco/
+          name: quality-reports
+          path: |
+            backend/build/reports/jacoco/jacocoTestReport/html
+            backend/build/reports/checkstyle/main.html
+            backend/build/reports/spotbugs/main.html
 
   docker:
     needs: build
