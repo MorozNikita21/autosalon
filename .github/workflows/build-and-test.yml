@@ -31,16 +31,6 @@ jobs:
         working-directory: backend
         run: ./gradlew clean build jacocoTestReport checkstyleMain spotbugsMain
 
-      - name: List all reports
-        working-directory: backend
-        run: |
-          echo "=== Jacoco HTML files ==="
-          find build/reports/jacoco/test/html -maxdepth 1 -type f
-          echo "=== Checkstyle HTML ==="
-          find build/reports/checkstyle -maxdepth 1 -type f
-          echo "=== SpotBugs HTML ==="
-          find build/reports/spotbugs -maxdepth 1 -type f
-
       - name: Upload quality reports
         uses: actions/upload-artifact@v4
         with:
@@ -56,8 +46,15 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USER }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
       - name: Build & push Docker
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v4
         with:
           context: backend
           file: backend/Dockerfile
