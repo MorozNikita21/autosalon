@@ -1,0 +1,14 @@
+spring:
+  config:
+    activate:
+      on-profile: dev
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/autosalon
+
+  liquibase:
+    contexts: development
+
+logging:
+  level:
+    root: DEBUG

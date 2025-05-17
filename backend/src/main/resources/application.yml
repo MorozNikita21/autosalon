@@ -1,13 +1,11 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/autosalon
     username: db_autosalon_name
     password: db_autosalon_pass
     driver-class-name: org.postgresql.Driver
 
   liquibase:
     change-log: classpath:db/changelog/db.changelog-master.yaml
-    contexts: development,test,production
     default-schema: public
 
   jpa:
@@ -23,6 +21,10 @@ spring:
     multipart:
       max-file-size: 10MB
       max-request-size: 10MB
+
+logging:
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} %-5level %logger{36} - %msg%n"
 
 server:
   port: 8080
