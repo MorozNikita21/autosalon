@@ -1,0 +1,1 @@
+[![Coverage](https://img.shields.io/codecov/c/github/yourorg/autosalon-backend?branch=main)](https://codecov.io/gh/yourorg/autosalon-backend)
