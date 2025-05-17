@@ -38,7 +38,7 @@ jobs:
         run: ./gradlew clean build jacocoTestReport --no-daemon
 
       - name: Upload quality reports
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v2.3.1
         with:
           name: quality-reports
           path: |
