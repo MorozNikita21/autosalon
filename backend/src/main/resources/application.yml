@@ -20,6 +20,16 @@ spring:
       max-file-size: 10MB
       max-request-size: 10MB
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus,loggers,env
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+
 logging:
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} %-5level %logger{36} - %msg%n"
