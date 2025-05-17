@@ -51,7 +51,7 @@ jobs:
         with:
           name: quality-reports
           path: |
-            backend/build/reports/jacoco/jacocoTestReport/html
+            backend/build/reports/jacoco/jacocoTestReport/test/html
             backend/build/reports/checkstyle/main.html
             backend/build/reports/spotbugs/main.html
 
