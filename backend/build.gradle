@@ -6,7 +6,7 @@ plugins {
     id 'jacoco'
     id 'checkstyle'
     id 'com.github.spotbugs' version "${spotbugsPluginVersion}"
-    id "com.github.kt3k.coveralls" version "${coverallsVersion}"
+    id "org.sonarqube" version "${sonarCloudVersion}"
 }
 
 configurations.all {
@@ -18,6 +18,19 @@ configurations.all {
                 'org.ow2.asm:asm-tree:9.5',
                 'org.ow2.asm:asm-util:9.5'
         )
+    }
+}
+
+sourceSets {
+    integrationTest {
+        java {
+            srcDir 'src/integrationTest/java'
+        }
+        resources {
+            srcDir 'src/integrationTest/resources'
+        }
+        compileClasspath += sourceSets.main.output + configurations.testRuntimeClasspath
+        runtimeClasspath += output + compileClasspath
     }
 }
 
@@ -34,11 +47,6 @@ jacoco {
     toolVersion = jacocoVersion
 }
 
-coveralls {
-    sourceDirs = files("src/main/java")
-    reportFile = file("build/reports/jacoco/test/html/jacocoTestReport.xml")
-}
-
 checkstyle {
     toolVersion = checkstyleVersion
     configFile = file("config/checkstyle/checkstyle.xml")
@@ -50,7 +58,17 @@ spotbugs {
     reportLevel = "low"
 }
 
+sonar {
+    properties {
+        property "sonar.projectKey", "MorozNikita21_autosalon"
+        property "sonar.organization", "moroznikita21"
+        property "sonar.host.url", "https://sonarcloud.io"
+    }
+}
+
 configurations {
+    integrationTestImplementation.extendsFrom testImplementation
+    integrationTestRuntimeOnly.extendsFrom testRuntimeOnly
     compileOnly {
         extendsFrom annotationProcessor
     }
@@ -92,6 +110,18 @@ dependencies {
 tasks.named('test') {
     useJUnitPlatform()
     systemProperty 'spring.profiles.active', 'test'
+}
+
+tasks.named('check') {
+    dependsOn tasks.named('integrationTest')
+}
+
+tasks.register('integrationTest', Test) {
+    description = 'Runs integration tests.'
+    group = 'verification'
+    testClassesDirs = sourceSets.integrationTest.output.classesDirs
+    classpath = sourceSets.integrationTest.runtimeClasspath
+    shouldRunAfter test
 }
 
 tasks.withType(JavaCompile).configureEach {

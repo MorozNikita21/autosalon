@@ -1,10 +1,14 @@
-name: Build & Test
+name: CI — Build, Test & Publish
 
 on:
   push:
     branches: [main]
   pull_request:
     branches: [main]
+
+permissions:
+  contents: read
+  packages: write
 
 jobs:
   build:
@@ -14,14 +18,30 @@ jobs:
       ACTIONS_RUNNER_DEBUG: true
       ACTIONS_STEP_DEBUG: true
 
-    steps:
-      - uses: actions/checkout@v4
+    strategy:
+      matrix:
+        java: [ 17, 21 ]
 
-      - name: Set up Java 17
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Cache Gradle
+        uses: actions/cache@v3
+        with:
+          path: |
+            backend/.gradle/caches
+            backend/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ matrix.java }}-${{ hashFiles('backend/**/*.gradle*','backend/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-${{ matrix.java }}-
+
+      - name: Set up JDK ${{ matrix.java }}
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: 17
+          java-version: ${{ matrix.java }}
+          cache: gradle
 
       - name: Grant execute permission
         working-directory: backend
@@ -29,23 +49,103 @@ jobs:
 
       - name: Build & generate reports
         working-directory: backend
-        run: ./gradlew clean build jacocoTestReport checkstyleMain spotbugsMain
+        run: ./gradlew clean build jacocoTestReport checkstyleMain spotbugsMain --no-daemon
 
       - name: Upload quality reports
         uses: actions/upload-artifact@v4
         with:
-          name: quality-reports
+          name: quality-reports-java${{ matrix.java }}
           path: |
             backend/build/reports/checkstyle
             backend/build/reports/spotbugs
             backend/build/reports/jacoco/test/html
 
-  docker:
+      - name: Publish coverage to Coveralls
+        uses: codecov/codecov-action@v3
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          coverage-token: ${{ secrets.COVERALLS_TOKEN }}
+          path-to-lcov: backend/build/reports/jacoco/test/html/jacocoTestReport.xml
+
+  integration:
     needs: build
+    runs-on: ubuntu-latest
+    services:
+      db:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: autosalon_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Wait for DB to be ready
+        run: |
+          for i in {1..30}; do
+            pg_isready -h localhost -U postgres && break
+            sleep 2
+          done
+
+      - name: Grant execute permission for Gradle wrapper
+        working-directory: backend
+        run: chmod +x gradlew
+
+      - name: Run integration tests
+        working-directory: backend
+        run: ./gradlew integrationTest --no-daemon
+
+  sonar:
+    name: SonarCloud Analysis
+    needs: [ build, integration ]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Cache Sonar & Gradle
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.sonar/cache
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-sonar-gradle-${{ hashFiles('**/*.gradle*','**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-sonar-gradle-
+
+      - name: Grant execute permission on Gradle wrapper
+        working-directory: backend
+        run: chmod +x gradlew
+
+      - name: Run SonarCloud analysis
+        working-directory: backend
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: ./gradlew sonarqube --no-daemon
+
+  docker:
+    needs: [build, integration]
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v2
@@ -53,10 +153,25 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USER }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build & push Docker
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+        with:
+          driver: docker-container
+
+      - name: Build & push multi-stage image
         uses: docker/build-push-action@v4
         with:
           context: backend
           file: backend/Dockerfile
           push: true
           tags: ${{ secrets.DOCKERHUB_USER }}/autosalon-backend:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Scan image for vulnerabilities
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ${{ secrets.DOCKERHUB_USER }}/autosalon-backend:latest
