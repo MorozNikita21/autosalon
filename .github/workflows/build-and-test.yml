@@ -96,6 +96,10 @@ jobs:
             sleep 2
           done
 
+      - name: Grant execute permission for Gradle wrapper
+        working-directory: backend
+        run: chmod +x gradlew
+
       - name: Run integration tests
         working-directory: backend
         run: ./gradlew integrationTest --no-daemon
