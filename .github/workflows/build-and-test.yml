@@ -68,11 +68,17 @@ jobs:
           path-to-lcov: backend/build/reports/jacoco/test/html/jacocoTestReport.xml
 
       - name: SonarCloud Scan
-        uses: SonarSource/sonarcloud-github-action@master
+        uses: SonarSource/sonarqube-scan-action@v5
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
-          organization: MorozNikita21
-          projectKey: MorozNikita21_autosalon
-          token: ${{ secrets.SONAR_TOKEN }}
+          scannerVersion: 'latest'
+          projectBaseDir: backend
+          args: >
+            -Dsonar.organization=MorozNikita21
+            -Dsonar.projectKey=MorozNikita21_autosalon
+            -Dsonar.sources=.
+            -Dsonar.java.binaries=build/classes
 
   integration:
     needs: build
