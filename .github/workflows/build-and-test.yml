@@ -75,8 +75,8 @@ jobs:
           scannerVersion: '7.0.2.4839'
           projectBaseDir: backend
           args: >
-            -Dsonar.organization=MorozNikita21
-            -Dsonar.projectKey=MorozNikita21_autosalon
+            -Dsonar.organization=moroznikita21
+            -Dsonar.projectKey=moroznikita21_autosalon
             -Dsonar.sources=.
             -Dsonar.java.binaries=build/classes
 
