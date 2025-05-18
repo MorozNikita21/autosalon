@@ -1,13 +1,23 @@
-FROM gradle:8.10.2-jdk21 AS build
+FROM eclipse-temurin:21-jdk AS builder
+WORKDIR /app
 
-WORKDIR /workspace
-COPY . .
-RUN gradle clean bootJar --no-daemon
+COPY build.gradle settings.gradle gradle.properties gradlew ./
+COPY gradle gradle
+COPY config config
 
-FROM gcr.io/distroless/java17-debian11
+RUN chmod +x gradlew && ./gradlew --no-daemon dependencies
 
-COPY --from=build /workspace/build/libs/*.jar /app/app.jar
+COPY src src
+RUN ./gradlew clean build -x test --no-daemon
 
-EXPOSE 8080
+FROM eclipse-temurin:21-jre
+WORKDIR /app
 
-ENTRYPOINT ["java", "-jar", "/app/app.jar"]
+RUN mkdir -p logs \
+    && chown -R 1000:1000 logs \
+    && chmod 755 logs
+
+COPY --from=builder /app/build/libs/*.jar app.jar
+
+USER 1000
+ENTRYPOINT ["java","-jar","app.jar"]

@@ -1,0 +1,6 @@
+.gradle
+build
+logs
+docker-compose*.yml
+.env
+.idea
