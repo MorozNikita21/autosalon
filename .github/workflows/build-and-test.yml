@@ -61,12 +61,11 @@ jobs:
             backend/build/reports/jacoco/test/html
 
       - name: Publish coverage to Coveralls
-        working-directory: backend
         uses: codecov/codecov-action@v3
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           coverage-token: ${{ secrets.COVERALLS_TOKEN }}
-          path-to-lcov: build/reports/jacoco/test/html/jacocoTestReport.xml
+          path-to-lcov: backend/build/reports/jacoco/test/html/jacocoTestReport.xml
 
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
