@@ -6,7 +6,6 @@ plugins {
     id 'jacoco'
     id 'checkstyle'
     id 'com.github.spotbugs' version "${spotbugsPluginVersion}"
-    id "com.github.kt3k.coveralls" version "${coverallsVersion}"
 }
 
 configurations.all {
@@ -32,11 +31,6 @@ java {
 
 jacoco {
     toolVersion = jacocoVersion
-}
-
-coveralls {
-    sourceDirs = files("src/main/java")
-    reportFile = file("build/reports/jacoco/test/html/jacocoTestReport.xml")
 }
 
 checkstyle {
