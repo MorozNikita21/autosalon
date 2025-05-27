@@ -7,7 +7,6 @@ plugins {
     id 'checkstyle'
     id 'org.sonarqube' version "${sonarCloudVersion}"
 
-    id "com.github.hauner.jacoco-lcov" version "${jacocoLcovVersion}"
     id 'com.github.spotbugs' version "${spotbugsPluginVersion}"
 }
 
@@ -47,20 +46,6 @@ java {
 
 jacoco {
     toolVersion = jacocoVersion
-}
-
-jacocoLcov {
-    jacocoReportFile = file("build/reports/jacoco/test/jacocoTestReport.xml")
-    lcovReportFile  = file("build/reports/jacoco/lcov/jacoco.lcov")
-}
-
-jacocoTestReport {
-    dependsOn test
-    reports {
-        xml.required.set(true)
-        html.required.set(true)
-        csv.required.set(false)
-    }
 }
 
 checkstyle {
@@ -143,8 +128,6 @@ tasks.register('integrationTest', Test) {
 tasks.withType(JavaCompile).configureEach {
     options.release.set(17)
 }
-
-tasks.jacocoLcov.dependsOn(tasks.jacocoTestReport)
 
 tasks.withType(JacocoReport).configureEach {
     reports {
