@@ -61,9 +61,10 @@ jobs:
             backend/build/reports/jacoco/test/html
 
       - name: Publish coverage to Coveralls via Gradle
+        working-directory: backend
         env:
           COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_TOKEN }}
-        run: ./backend/gradlew coveralls --no-daemon
+        run: ./gradlew coveralls --no-daemon
 
   integration:
     needs: build
