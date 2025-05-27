@@ -64,7 +64,7 @@ jobs:
         uses: coverallsapp/github-action@v1
         with:
           repo-token: ${{ secrets.COVERALLS_TOKEN }}
-          path-to-lcov: backend/build/reports/jacoco/test/html/jacocoTestReport.xml
+          path-to-lcov: backend/build/reports/jacoco/test/jacocoTestReport.xml
 
   integration:
     needs: build
