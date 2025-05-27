@@ -1,7 +1,9 @@
 pluginManagement {
     repositories {
         maven { url = 'https://repo.spring.io/snapshot' }
+        maven { url = uri("https://jitpack.io") }
         gradlePluginPortal()
+        mavenCentral()
     }
 }
 rootProject.name = 'autosalon-backend'
