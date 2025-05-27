@@ -6,6 +6,7 @@ plugins {
     id 'jacoco'
     id 'checkstyle'
     id 'org.sonarqube' version "${sonarCloudVersion}"
+    id "org.kt3k.coveralls" version "${coverallsVersion}"
 
     id 'com.github.spotbugs' version "${spotbugsPluginVersion}"
 }
@@ -75,6 +76,11 @@ configurations {
     }
 }
 
+coveralls {
+    jacocoReportPath = "build/reports/jacoco/test/jacocoTestReport.xml"
+    sourceDirs = files("src/main/java")
+}
+
 repositories {
     mavenCentral()
 }
@@ -129,7 +135,8 @@ tasks.withType(JavaCompile).configureEach {
     options.release.set(17)
 }
 
-tasks.withType(JacocoReport).configureEach {
+tasks.jacocoTestReport {
+    dependsOn test
     reports {
         xml.required.set(true)
         html.required.set(true)

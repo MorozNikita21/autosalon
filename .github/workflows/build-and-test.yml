@@ -60,12 +60,10 @@ jobs:
             backend/build/reports/spotbugs
             backend/build/reports/jacoco/test/html
 
-      - name: Publish coverage to Coveralls
-        uses: coverallsapp/github-action@v1
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          path-to-lcov: backend/build/reports/jacoco/test/jacocoTestReport.xml
-          coveralls-endpoint: https://coveralls.io
+      - name: Publish coverage to Coveralls via Gradle
+        env:
+          COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_TOKEN }}
+        run: ./gradlew coveralls --no-daemon
 
   integration:
     needs: build
