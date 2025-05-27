@@ -61,10 +61,9 @@ jobs:
             backend/build/reports/jacoco/test/html
 
       - name: Publish coverage to Coveralls
-        uses: codecov/codecov-action@v3
+        uses: coverallsapp/github-action@v1
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          coverage-token: ${{ secrets.COVERALLS_TOKEN }}
+          repo-token: ${{ secrets.COVERALLS_REPO_TOKEN }}
           path-to-lcov: backend/build/reports/jacoco/test/html/jacocoTestReport.xml
 
   integration:
