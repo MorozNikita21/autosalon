@@ -49,6 +49,13 @@ jacoco {
     toolVersion = jacocoVersion
 }
 
+jacocoTestReport {
+    reports {
+        xml.required = true
+        html.required = true
+    }
+}
+
 checkstyle {
     toolVersion = checkstyleVersion
     configFile = file("config/checkstyle/checkstyle.xml")
@@ -135,6 +142,12 @@ tasks.withType(JacocoReport).configureEach {
         xml.required.set(true)
         html.required.set(true)
     }
+}
+
+tasks.jacocoTestLcov(type: com.github.hauner.jacoco.lcov.JacocoLcovReport) {
+    dependsOn jacocoTestReport
+    jacocoReport = jacocoTestReport
+    outputFile = file("$buildDir/reports/jacoco/test/jacocoTestReport.info")
 }
 
 tasks.withType(Checkstyle).configureEach {

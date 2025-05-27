@@ -60,11 +60,17 @@ jobs:
             backend/build/reports/spotbugs
             backend/build/reports/jacoco/test/html
 
+      - name: Generate LCOV
+        working-directory: backend
+        run: ./gradlew jacocoTestLcov
+
       - name: Publish coverage to Coveralls
         uses: coverallsapp/github-action@v1
+        env:
+          COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_TOKEN }}
         with:
-          repo-token: ${{ secrets.COVERALLS_TOKEN }}
-          path-to-lcov: backend/build/reports/jacoco/test/jacocoTestReport.xml
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path-to-lcov: backend/build/reports/jacoco/test/jacocoTestReport.info
 
   integration:
     needs: build
