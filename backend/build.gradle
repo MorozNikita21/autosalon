@@ -5,8 +5,10 @@ plugins {
 
     id 'jacoco'
     id 'checkstyle'
+    id 'org.sonarqube' version "${sonarCloudVersion}"
+
     id 'com.github.spotbugs' version "${spotbugsPluginVersion}"
-    id "org.sonarqube" version "${sonarCloudVersion}"
+    id 'com.github.hauner:jacoco-lcov' version "${jacocoLcovVersion}"
 }
 
 configurations.all {
