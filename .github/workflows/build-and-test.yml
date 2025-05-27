@@ -63,7 +63,7 @@ jobs:
       - name: Publish coverage to Coveralls via Gradle
         env:
           COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_TOKEN }}
-        run: ./gradlew coveralls --no-daemon
+        run: ./backend/gradlew coveralls --no-daemon
 
   integration:
     needs: build
