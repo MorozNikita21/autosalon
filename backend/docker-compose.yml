@@ -23,6 +23,7 @@ services:
       - autosalon-net
 
   backend:
+    container_name: autosalon-backend
     build:
       context: .
       dockerfile: Dockerfile
