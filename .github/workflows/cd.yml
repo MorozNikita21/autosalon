@@ -51,7 +51,7 @@ jobs:
     name: Deploy to Test
     needs: publish-image
     if: github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted]
     steps:
       - name: Deploy via SSH to Test Server
         uses: appleboy/ssh-action@v0.1.7
@@ -73,7 +73,7 @@ jobs:
     name: Deploy to Production
     needs: publish-image
     if: startsWith(github.ref, 'refs/tags/v')
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted]
     steps:
       - name: Deploy via SSH to Prod Server
         uses: appleboy/ssh-action@v0.1.7
