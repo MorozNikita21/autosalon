@@ -47,47 +47,47 @@ jobs:
           docker tag ${{ env.IMAGE_NAME }}:${{ github.sha }} ${{ env.IMAGE_NAME }}:$RELEASE_TAG
           docker push ${{ env.IMAGE_NAME }}:$RELEASE_TAG
 
-  deploy-test:
-    name: Deploy to Test
-    needs: publish-image
-    if: github.ref == 'refs/heads/main'
-    runs-on: [self-hosted]
-    steps:
-      - name: Deploy via SSH to Test Server
-        uses: appleboy/ssh-action@v0.1.7
-        with:
-          host: ${{ secrets.TEST_SSH_HOST }}
-          username: ${{ secrets.TEST_SSH_USER }}
-          key: ${{ secrets.TEST_SSH_KEY }}
-          script: |
-            docker pull ${{ env.IMAGE_NAME }}:latest
-            docker rm -f autosalon-backend-test || true
-            docker run -d \
-              --name autosalon-backend-test \
-              --restart=always \
-              -p 8080:8080 \
-              --env-file backend/.env.test \
-              ${{ env.IMAGE_NAME }}:latest
+#  deploy-test:
+#    name: Deploy to Test
+#    needs: publish-image
+#    if: github.ref == 'refs/heads/main'
+#    runs-on: [self-hosted]
+#    steps:
+#      - name: Deploy via SSH to Test Server
+#        uses: appleboy/ssh-action@v0.1.7
+#        with:
+#          host: ${{ secrets.TEST_SSH_HOST }}
+#          username: ${{ secrets.TEST_SSH_USER }}
+#          key: ${{ secrets.TEST_SSH_KEY }}
+#          script: |
+#            docker pull ${{ env.IMAGE_NAME }}:latest
+#            docker rm -f autosalon-backend-test || true
+#            docker run -d \
+#              --name autosalon-backend-test \
+#              --restart=always \
+#              -p 8080:8080 \
+#              --env-file backend/.env.test \
+#              ${{ env.IMAGE_NAME }}:latest
 
-  deploy-prod:
-    name: Deploy to Production
-    needs: publish-image
-    if: startsWith(github.ref, 'refs/tags/v')
-    runs-on: [self-hosted]
-    steps:
-      - name: Deploy via SSH to Prod Server
-        uses: appleboy/ssh-action@v0.1.7
-        with:
-          host: ${{ secrets.PROD_SSH_HOST }}
-          username: ${{ secrets.PROD_SSH_USER }}
-          key: ${{ secrets.PROD_SSH_KEY }}
-          script: |
-            RELEASE_TAG=${GITHUB_REF#refs/tags/}
-            docker pull ${{ env.IMAGE_NAME }}:$RELEASE_TAG
-            docker rm -f autosalon-backend-prod || true
-            docker run -d \
-              --name autosalon-backend-prod \
-              --restart=always \
-              -p 8080:8080 \
-              --env-file backend/.env.prod \
-              ${{ env.IMAGE_NAME }}:$RELEASE_TAG
+#  deploy-prod:
+#    name: Deploy to Production
+#    needs: publish-image
+#    if: startsWith(github.ref, 'refs/tags/v')
+#    runs-on: [self-hosted]
+#    steps:
+#      - name: Deploy via SSH to Prod Server
+#        uses: appleboy/ssh-action@v0.1.7
+#        with:
+#          host: ${{ secrets.PROD_SSH_HOST }}
+#          username: ${{ secrets.PROD_SSH_USER }}
+#          key: ${{ secrets.PROD_SSH_KEY }}
+#          script: |
+#            RELEASE_TAG=${GITHUB_REF#refs/tags/}
+#            docker pull ${{ env.IMAGE_NAME }}:$RELEASE_TAG
+#            docker rm -f autosalon-backend-prod || true
+#            docker run -d \
+#              --name autosalon-backend-prod \
+#              --restart=always \
+#              -p 8080:8080 \
+#              --env-file backend/.env.prod \
+#              ${{ env.IMAGE_NAME }}:$RELEASE_TAG
