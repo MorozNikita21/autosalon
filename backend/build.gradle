@@ -65,6 +65,9 @@ sonar {
         property "sonar.projectKey", "MorozNikita21_autosalon"
         property "sonar.organization", "moroznikita21"
         property "sonar.host.url", "https://sonarcloud.io"
+
+        property "sonar.java.binaries", "build/classes/java/main"
+        property "sonar.java.test.binaries", "build/classes/java/test"
     }
 }
 
