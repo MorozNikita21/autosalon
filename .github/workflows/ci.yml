@@ -132,6 +132,9 @@ jobs:
         working-directory: backend
         run: chmod +x gradlew
 
+      - name: Build & Test
+        run: ./gradlew clean build --no-daemon
+
       - name: Run SonarCloud analysis
         working-directory: backend
         env:
