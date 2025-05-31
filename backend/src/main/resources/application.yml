@@ -1,4 +1,9 @@
 spring:
+  security:
+    user:
+      name: admin
+      password: secret123
+
   datasource:
     driver-class-name: org.postgresql.Driver
 
@@ -19,11 +24,6 @@ spring:
     multipart:
       max-file-size: 10MB
       max-request-size: 10MB
-
-  security:
-    user:
-      name: admin
-      password: secret123
 
 management:
   endpoints:
