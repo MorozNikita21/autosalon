@@ -123,6 +123,7 @@ dependencies {
 tasks.named('test') {
     useJUnitPlatform()
     systemProperty 'spring.profiles.active', 'test'
+    finalizedBy tasks.jacocoTestReport
 }
 
 tasks.named('check') {
@@ -160,4 +161,8 @@ tasks.withType(com.github.spotbugs.snom.SpotBugsTask).configureEach {
         xml.required.set(true)
         html.required.set(true)
     }
+}
+
+tasks.named("sonarqube") {
+    dependsOn tasks.named("classes")
 }
