@@ -1,4 +1,4 @@
-FROM eclipse-temurin:21-jdk AS builder
+FROM eclipse-temurin:17-jdk AS builder
 WORKDIR /app
 
 COPY build.gradle settings.gradle gradle.properties gradlew ./
@@ -10,7 +10,7 @@ RUN chmod +x gradlew && ./gradlew --no-daemon dependencies
 COPY src src
 RUN ./gradlew clean build -x test --no-daemon
 
-FROM eclipse-temurin:21-jre
+FROM eclipse-temurin:17-jre
 WORKDIR /app
 
 RUN mkdir -p logs \
