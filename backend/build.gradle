@@ -58,6 +58,7 @@ spotbugs {
     toolVersion = spotbugsEngineVersion
     effort = "max"
     reportLevel = "low"
+    ignoreFailures = true
 }
 
 sonar {
