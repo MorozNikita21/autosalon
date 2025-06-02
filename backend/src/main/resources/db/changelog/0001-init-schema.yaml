@@ -79,3 +79,19 @@ databaseChangeLog:
         - sqlFile:
             path: sql/create_constraints.sql
             relativeToChangelogFile: true
+
+  - changeSet:
+      id: create-role
+      author: autosalon
+      changes:
+        - sqlFile:
+            path: sql/create_role.sql
+            relativeToChangelogFile: true
+
+  - changeSet:
+      id: create-account-role
+      author: autosalon
+      changes:
+        - sqlFile:
+            path: sql/create_account_role.sql
+            relativeToChangelogFile: true
