@@ -1,21 +1,16 @@
 package com.autosalon.backend.auth.controller;
 
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-
 import com.autosalon.backend.auth.dto.JwtResponse;
 import com.autosalon.backend.auth.dto.LoginRequest;
 import com.autosalon.backend.auth.dto.MessageResponse;
 import com.autosalon.backend.auth.dto.RegisterRequest;
 import com.autosalon.backend.auth.repository.AuthAccountRepository;
+import com.autosalon.backend.auth.repository.AuthClientRepository;
 import com.autosalon.backend.auth.repository.AuthRoleRepository;
 import com.autosalon.backend.auth.security.JwtUtils;
 import com.autosalon.backend.auth.service.AuthService;
 import com.autosalon.backend.auth.service.UserDetailsImpl;
 import com.autosalon.backend.general.entity.Account;
-import com.autosalon.backend.general.entity.Client;
 import com.autosalon.backend.general.entity.ERole;
 import com.autosalon.backend.general.entity.Role;
 import jakarta.validation.Valid;
@@ -32,12 +27,17 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
 
     private final AuthenticationManager authenticationManager;
     private final AuthAccountRepository authAccountRepository;
+    private final AuthClientRepository authClientRepository;
     private final AuthRoleRepository authRoleRepository;
     private final PasswordEncoder encoder;
     private final JwtUtils jwtUtils;
@@ -46,11 +46,13 @@ public class AuthController {
     public AuthController(AuthenticationManager authenticationManager,
                           AuthAccountRepository authAccountRepository,
                           AuthRoleRepository authRoleRepository,
+                          AuthClientRepository authClientRepository,
                           PasswordEncoder encoder,
                           JwtUtils jwtUtils,
                           AuthService authService) {
         this.authenticationManager = authenticationManager;
         this.authAccountRepository = authAccountRepository;
+        this.authClientRepository = authClientRepository;
         this.authRoleRepository = authRoleRepository;
         this.encoder = encoder;
         this.jwtUtils = jwtUtils;
@@ -74,11 +76,13 @@ public class AuthController {
                     .map(item -> item.getAuthority())
                     .collect(Collectors.toList());
 
-            return ResponseEntity.ok(new JwtResponse(jwt, userDetails.getUsername(), roles));
+            return ResponseEntity
+                    .status(HttpStatus.CREATED)
+                    .body(new JwtResponse(jwt, userDetails.getUsername(), roles));
 
         } catch (BadCredentialsException ex) {
             return ResponseEntity
-                    .status(HttpStatus.UNAUTHORIZED)
+                    .status(HttpStatus.CONFLICT)
                     .body(new MessageResponse("Неверное имя пользователя или пароль."));
         }
     }
@@ -87,8 +91,14 @@ public class AuthController {
     public ResponseEntity<?> registerUser(@Valid @RequestBody RegisterRequest signUpRequest) {
         if (authAccountRepository.existsByLogin(signUpRequest.getLogin())) {
             return ResponseEntity
-                    .badRequest()
+                    .status(HttpStatus.CONFLICT)
                     .body(new MessageResponse("Ошибка: Логин уже занят другим пользователем."));
+        }
+
+        if (authClientRepository.existsByEmail(signUpRequest.getEmail())) {
+            return ResponseEntity
+                    .status(HttpStatus.CONFLICT)
+                    .body(new MessageResponse("Ошибка: адрес электронной почты уже используется."));
         }
 
         if (!signUpRequest.getPassword().equals(signUpRequest.getConfirmPassword())) {
@@ -102,7 +112,7 @@ public class AuthController {
         account.setPassword(encoder.encode(signUpRequest.getPassword()));
         account.setPhoneNumber(signUpRequest.getPhoneNumber());
 
-        Role userRole = authRoleRepository.findByName(ERole.ROLE_CLIENT)
+        Role userRole = authRoleRepository.findByName(ERole.CLIENT)
                 .orElseThrow(() -> new RuntimeException("Ошибка: Роль не найдена."));
         account.setRoles(Set.of(userRole));
 
@@ -110,6 +120,8 @@ public class AuthController {
 
         authService.createClientProfile(account, signUpRequest);
 
-        return ResponseEntity.ok(new MessageResponse("Пользователь успешно зарегистрирован."));
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(new MessageResponse("Пользователь успешно зарегистрирован."));
     }
 }

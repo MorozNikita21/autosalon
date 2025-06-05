@@ -9,4 +9,5 @@ import java.util.Optional;
 @Repository
 public interface AuthClientRepository extends JpaRepository<Client, Long> {
     Optional<Client> findByLogin(String login);
+    Boolean existsByEmail(String email);
 }

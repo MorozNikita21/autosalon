@@ -24,6 +24,7 @@ public class JwtResponse {
     public JwtResponse(String accessToken, String login, List<String> roles) {
         this.token = accessToken;
         this.login = login;
+        this.type = "Bearer";
         this.roles = roles;
     }
 }

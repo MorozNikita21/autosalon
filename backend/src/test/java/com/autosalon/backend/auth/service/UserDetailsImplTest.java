@@ -52,9 +52,9 @@ class UserDetailsImplTest {
         account.setPassword("secret");
 
         Role roleClient = new Role();
-        roleClient.setName(ERole.ROLE_CLIENT);
+        roleClient.setName(ERole.CLIENT);
         Role roleAdmin = new Role();
-        roleAdmin.setName(ERole.ROLE_ADMIN);
+        roleAdmin.setName(ERole.ADMIN);
 
         Set<Role> roles = new HashSet<>();
         roles.add(roleClient);

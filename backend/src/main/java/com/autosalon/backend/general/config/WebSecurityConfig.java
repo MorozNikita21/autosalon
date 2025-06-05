@@ -3,6 +3,10 @@ package com.autosalon.backend.general.config;
 import com.autosalon.backend.auth.security.AuthEntryPointJwt;
 import com.autosalon.backend.auth.security.AuthTokenFilter;
 import com.autosalon.backend.auth.service.UserDetailsServiceImpl;
+import io.swagger.v3.oas.models.Components;
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
+import io.swagger.v3.oas.models.security.SecurityScheme;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -43,6 +47,18 @@ public class WebSecurityConfig {
     }
 
     @Bean
+    public OpenAPI customOpenAPI() {
+        return new OpenAPI()
+                .components(new Components()
+                        .addSecuritySchemes("BearerAuth",
+                                new SecurityScheme()
+                                        .type(SecurityScheme.Type.HTTP)
+                                        .scheme("bearer")
+                                        .bearerFormat("JWT")))
+                .addSecurityItem(new SecurityRequirement().addList("BearerAuth"));
+    }
+
+    @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
@@ -57,8 +73,7 @@ public class WebSecurityConfig {
 
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
-                                "/api/auth/register",
-                                "/api/auth/login",
+                                "/api/auth/**",
                                 "/swagger-ui.html",
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**",

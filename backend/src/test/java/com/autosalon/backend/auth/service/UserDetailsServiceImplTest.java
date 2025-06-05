@@ -35,7 +35,7 @@ class UserDetailsServiceImplTest {
         acc.setLogin("mia");
         acc.setPassword("pwd");
         Role clientRole = new Role();
-        clientRole.setName(ERole.ROLE_CLIENT);
+        clientRole.setName(ERole.CLIENT);
         acc.setRoles(Set.of(clientRole));
 
         when(accountRepo.findByLogin("mia")).thenReturn(Optional.of(acc));

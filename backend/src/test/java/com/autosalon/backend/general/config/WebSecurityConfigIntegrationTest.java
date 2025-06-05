@@ -1,5 +1,9 @@
 package com.autosalon.backend.general.config;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -10,7 +14,11 @@ import com.autosalon.backend.auth.service.UserDetailsImpl;
 import com.autosalon.backend.general.entity.Account;
 import com.autosalon.backend.general.entity.ERole;
 import com.autosalon.backend.general.entity.Role;
+import io.swagger.v3.oas.models.Components;
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.security.SecurityScheme;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -28,6 +36,8 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
         "autosalon.app.jwtExpirationMs=60000"
 })
 class WebSecurityConfigIntegrationTest {
+
+    private final WebSecurityConfig config = new WebSecurityConfig(null, null, null);
 
     @Autowired
     private MockMvc mockMvc;
@@ -50,11 +60,11 @@ class WebSecurityConfigIntegrationTest {
         authRoleRepository.deleteAll();
 
         Role clientRole = new Role();
-        clientRole.setName(ERole.ROLE_CLIENT);
+        clientRole.setName(ERole.CLIENT);
         authRoleRepository.save(clientRole);
 
         Role adminRole = new Role();
-        adminRole.setName(ERole.ROLE_ADMIN);
+        adminRole.setName(ERole.ADMIN);
         authRoleRepository.save(adminRole);
 
         Account client = new Account();
@@ -70,6 +80,50 @@ class WebSecurityConfigIntegrationTest {
         admin.setPhoneNumber("+70000000002");
         admin.getRoles().add(adminRole);
         authAccountRepository.save(admin);
+    }
+
+    @Test
+    @DisplayName("customOpenAPI() должен возвращать non-null OpenAPI объект")
+    void customOpenAPIShouldNotBeNull() {
+        OpenAPI openAPI = config.customOpenAPI();
+        assertNotNull(openAPI, "Метод customOpenAPI не должен возвращать null");
+    }
+
+    @Test
+    @DisplayName("В OpenAPI должны содержаться компоненты с SecurityScheme \"BearerAuth\"")
+    void componentsShouldContainBearerAuthScheme() {
+        OpenAPI openAPI = config.customOpenAPI();
+        Components components = openAPI.getComponents();
+        assertNotNull(components, "Components не должен быть null");
+
+        var schemes = components.getSecuritySchemes();
+        assertNotNull(schemes, "SecuritySchemes не должен быть null");
+        assertTrue(schemes.containsKey("BearerAuth"),
+                "SecuritySchemes должен содержать ключ \"BearerAuth\"");
+
+        SecurityScheme scheme = schemes.get("BearerAuth");
+        assertNotNull(scheme, "SecurityScheme по ключу \"BearerAuth\" не должен быть null");
+
+        assertEquals(SecurityScheme.Type.HTTP, scheme.getType(),
+                "Type схемы должен быть HTTP");
+        assertEquals("bearer", scheme.getScheme(),
+                "Scheme должен быть \"bearer\"");
+        assertEquals("JWT", scheme.getBearerFormat(),
+                "BearerFormat должен быть \"JWT\"");
+    }
+
+    @Test
+    @DisplayName("В OpenAPI должен присутствовать SecurityRequirement с ключом \"BearerAuth\"")
+    void securityItemsShouldContainBearerAuthRequirement() {
+        OpenAPI openAPI = config.customOpenAPI();
+
+        var securityRequirements = openAPI.getSecurity();
+        assertNotNull(securityRequirements, "Список SecurityRequirement не должен быть null");
+        assertFalse(securityRequirements.isEmpty(), "Список SecurityRequirement не должен быть пустым");
+
+        boolean found = securityRequirements.stream()
+                .anyMatch(req -> req.containsKey("BearerAuth"));
+        assertTrue(found, "Должен быть SecurityRequirement с ключом \"BearerAuth\"");
     }
 
     @Test

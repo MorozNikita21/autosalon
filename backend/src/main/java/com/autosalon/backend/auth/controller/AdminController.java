@@ -67,7 +67,7 @@ public class AdminController {
         for (String roleNameStr : req.getRoles()) {
             ERole eRole;
             try {
-                eRole = ERole.valueOf("ROLE_" + roleNameStr.toUpperCase());
+                eRole = ERole.valueOf(roleNameStr.toUpperCase());
             } catch (IllegalArgumentException ex) {
                 return ResponseEntity
                         .badRequest()
@@ -94,7 +94,7 @@ public class AdminController {
         for (String roleNameStr : req.getRoles()) {
             ERole eRole;
             try {
-                eRole = ERole.valueOf("ROLE_" + roleNameStr.toUpperCase());
+                eRole = ERole.valueOf(roleNameStr.toUpperCase());
             } catch (IllegalArgumentException ex) {
                 return ResponseEntity
                         .badRequest()
@@ -131,7 +131,7 @@ public class AdminController {
     @GetMapping("/all-roles")
     public ResponseEntity<?> getAllRoles() {
         List<String> roleNames = authRoleRepository.findAll().stream()
-                .map(role -> role.getName().name().replace("ROLE_", ""))
+                .map(role -> role.getName().name())
                 .collect(Collectors.toList());
         return ResponseEntity.ok(roleNames);
     }

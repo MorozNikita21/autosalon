@@ -3,6 +3,7 @@ package com.autosalon.backend.auth.controller;
 import com.autosalon.backend.auth.dto.LoginRequest;
 import com.autosalon.backend.auth.dto.RegisterRequest;
 import com.autosalon.backend.auth.repository.AuthAccountRepository;
+import com.autosalon.backend.auth.repository.AuthClientRepository;
 import com.autosalon.backend.auth.repository.AuthRoleRepository;
 import com.autosalon.backend.auth.security.JwtUtils;
 import com.autosalon.backend.auth.service.AuthService;
@@ -67,6 +68,9 @@ class AuthControllerTest {
     private AuthRoleRepository authRoleRepository;
 
     @MockBean
+    private AuthClientRepository authClientRepository;
+
+    @MockBean
     private JwtUtils jwtUtils;
 
     @MockBean
@@ -101,9 +105,9 @@ class AuthControllerTest {
 
         Role clientRole = Role.builder()
                 .id(1L)
-                .name(ERole.ROLE_CLIENT)
+                .name(ERole.CLIENT)
                 .build();
-        when(authRoleRepository.findByName(ERole.ROLE_CLIENT))
+        when(authRoleRepository.findByName(ERole.CLIENT))
                 .thenReturn(Optional.of(clientRole));
 
         when(passwordEncoder.encode("Passw0rd!")).thenReturn("encodedPassword");
@@ -115,7 +119,7 @@ class AuthControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .characterEncoding("UTF-8")
                         .content(objectMapper.writeValueAsString(validRegisterDto)))
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.message", Matchers.is("Пользователь успешно зарегистрирован.")));
 
         verify(authService, times(1))
@@ -128,7 +132,7 @@ class AuthControllerTest {
         assertEquals("encodedPassword", savedAccount.getPassword());
         assertEquals("+79160001122", savedAccount.getPhoneNumber());
         assertEquals(1, savedAccount.getRoles().size());
-        assertEquals(ERole.ROLE_CLIENT, savedAccount.getRoles().iterator().next().getName());
+        assertEquals(ERole.CLIENT, savedAccount.getRoles().iterator().next().getName());
     }
 
     @Test
@@ -138,7 +142,7 @@ class AuthControllerTest {
         mockMvc.perform(post("/api/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(validRegisterDto)))
-                .andExpect(status().isBadRequest())
+                .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.message").value("Ошибка: Логин уже занят другим пользователем."));
 
         verify(authAccountRepository, never()).save(any(Account.class));
@@ -194,7 +198,7 @@ class AuthControllerTest {
         mockMvc.perform(post("/api/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(validLoginDto)))
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.token").value("jwt123"))
                 .andExpect(jsonPath("$.login").value("loginA"))
                 .andExpect(jsonPath("$.roles[0]").value("ROLE_CLIENT"));
@@ -212,7 +216,7 @@ class AuthControllerTest {
         mockMvc.perform(post("/api/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(badLogin)))
-                .andExpect(status().isUnauthorized())
+                .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.message").value("Неверное имя пользователя или пароль."));
     }
 }

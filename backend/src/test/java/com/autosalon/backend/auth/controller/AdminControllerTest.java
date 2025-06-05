@@ -79,11 +79,11 @@ class AdminControllerTest {
     void setUp() {
         roleClient = new Role();
         roleClient.setId(2L);
-        roleClient.setName(ERole.ROLE_CLIENT);
+        roleClient.setName(ERole.CLIENT);
 
         roleAdmin = new Role();
         roleAdmin.setId(1L);
-        roleAdmin.setName(ERole.ROLE_ADMIN);
+        roleAdmin.setName(ERole.ADMIN);
     }
 
     @Test
@@ -96,8 +96,8 @@ class AdminControllerTest {
         req.setRoles(List.of("CLIENT", "ADMIN"));
 
         when(accountRepo.existsByLogin("newUser")).thenReturn(false);
-        when(roleRepo.findByName(ERole.ROLE_CLIENT)).thenReturn(Optional.of(roleClient));
-        when(roleRepo.findByName(ERole.ROLE_ADMIN)).thenReturn(Optional.of(roleAdmin));
+        when(roleRepo.findByName(ERole.CLIENT)).thenReturn(Optional.of(roleClient));
+        when(roleRepo.findByName(ERole.ADMIN)).thenReturn(Optional.of(roleAdmin));
         when(accountRepo.save(any(Account.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
 
@@ -119,8 +119,8 @@ class AdminControllerTest {
 
         Set<Role> assignedRoles = savedWithRoles.getRoles();
         assertThat(assignedRoles, hasSize(2));
-        assertTrue(assignedRoles.stream().anyMatch(r -> r.getName() == ERole.ROLE_CLIENT));
-        assertTrue(assignedRoles.stream().anyMatch(r -> r.getName() == ERole.ROLE_ADMIN));
+        assertTrue(assignedRoles.stream().anyMatch(r -> r.getName() == ERole.CLIENT));
+        assertTrue(assignedRoles.stream().anyMatch(r -> r.getName() == ERole.ADMIN));
     }
 
     @Test
@@ -236,8 +236,8 @@ class AdminControllerTest {
         existing.setLogin("john");
         existing.setRoles(new HashSet<>());
         when(accountRepo.findByLogin("john")).thenReturn(Optional.of(existing));
-        when(roleRepo.findByName(ERole.ROLE_ADMIN)).thenReturn(Optional.of(roleAdmin));
-        when(roleRepo.findByName(ERole.ROLE_CLIENT)).thenReturn(Optional.of(roleClient));
+        when(roleRepo.findByName(ERole.ADMIN)).thenReturn(Optional.of(roleAdmin));
+        when(roleRepo.findByName(ERole.CLIENT)).thenReturn(Optional.of(roleClient));
         when(accountRepo.save(any(Account.class)))
                 .thenAnswer(inv -> inv.getArgument(0));
 
@@ -254,8 +254,8 @@ class AdminControllerTest {
         assertEquals("john", saved.getLogin());
         Set<Role> updatedRoles = saved.getRoles();
         assertThat(updatedRoles, hasSize(2));
-        assertTrue(updatedRoles.stream().anyMatch(r -> r.getName() == ERole.ROLE_ADMIN));
-        assertTrue(updatedRoles.stream().anyMatch(r -> r.getName() == ERole.ROLE_CLIENT));
+        assertTrue(updatedRoles.stream().anyMatch(r -> r.getName() == ERole.ADMIN));
+        assertTrue(updatedRoles.stream().anyMatch(r -> r.getName() == ERole.CLIENT));
     }
 
     @Test

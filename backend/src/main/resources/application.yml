@@ -43,5 +43,5 @@ server:
 
 autosalon:
   app:
-    jwtSecret: VerySecretKey1234567890
+    jwtSecret: 0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF
     jwtExpirationMs: 86400000
