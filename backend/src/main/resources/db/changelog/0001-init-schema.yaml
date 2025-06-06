@@ -95,3 +95,11 @@ databaseChangeLog:
         - sqlFile:
             path: sql/create_account_role.sql
             relativeToChangelogFile: true
+
+  - changeSet:
+      id: insert_photo_url_on_client
+      author: autosalon
+      changes:
+        - sqlFile:
+            path: sql/insert_photo_url_on_client.sql
+            relativeToChangelogFile: true

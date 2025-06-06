@@ -55,6 +55,9 @@ public class Client {
     @Column(name = "driver_license", length = 50)
     private String driverLicense;
 
+    @Column(name = "photo_url", length = 255)
+    private String photoUrl;
+
     @Column(name = "first_license_date")
     private LocalDate firstLicenseDate;
 

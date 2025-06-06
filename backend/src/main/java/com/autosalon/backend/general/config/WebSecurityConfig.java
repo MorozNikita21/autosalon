@@ -81,6 +81,8 @@ public class WebSecurityConfig {
                                 "/actuator/prometheus"
                         ).permitAll()
 
+                        .requestMatchers("api/profile/**").authenticated()
+
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
 
                         .anyRequest().authenticated()
